@@ -17,4 +17,6 @@ int order_get_next(system_t* system);
 
 void order_clear_floor(system_t *system, int floor);
 
+void order_clear_all(system_t *system);
+
 #endif // ORDER_H

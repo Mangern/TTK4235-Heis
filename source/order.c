@@ -9,6 +9,9 @@ void order_tick(system_t* system) {
     // FAT O2
     if (system->floor == -1) return;
 
+    // FAT S6
+    if (system->state == STOP || system->state == STOP_AT_FLOOR) return;
+
     for (size_t floor = 0; floor < N_FLOORS; ++floor) {
         for (size_t button = 0; button < N_BUTTONS; ++button) {
             if (elevio_callButton(floor, button)) {
@@ -28,8 +31,10 @@ int order_get_next(system_t* system) {
         switch(system->goal_dir) {
             case DIRN_UP:
             {
-                for (int floor = system->floor; floor < system->goal_floor; ++floor) {
-                    // Don't take orders in reverse direction (FAT H2)
+                int start_floor = system->floor;
+                if (system->floor_status != AT_VALID)start_floor++;
+                for (int floor = start_floor; floor < system->goal_floor; ++floor) {
+                    // FAT H2: Don't take orders in reverse direction
                     if (system->order_table[floor][BUTTON_HALL_UP] || system->order_table[floor][BUTTON_CAB])
                         return floor;
                 }
@@ -44,8 +49,11 @@ int order_get_next(system_t* system) {
             break;
             case DIRN_DOWN:
             {
+                int start_floor = system->floor;
+                if (system->floor_status != AT_VALID)start_floor--;
+
                 for (int floor = system->floor; floor > system->goal_floor; --floor) {
-                    // Don't take orders in reverse direction (FAT H2)
+                    // FAT H2: Don't take orders in reverse direction
                     if (system->order_table[floor][BUTTON_HALL_DOWN] || system->order_table[floor][BUTTON_CAB])
                         return floor;
                 }
@@ -78,5 +86,13 @@ int order_get_next(system_t* system) {
 void order_clear_floor(system_t *system, int floor) {
     for (int button = 0; button < N_BUTTONS; ++button) {
         system->order_table[floor][button] = false;
+    }
+}
+
+void order_clear_all(system_t *system) {
+    for (int floor = 0; floor < N_FLOORS; ++floor) {
+        for (int button = 0; button < N_BUTTONS; ++button) {
+            system->order_table[floor][button] = false;
+        }
     }
 }

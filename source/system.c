@@ -16,10 +16,17 @@ void system_init(system_t *system) {
     system->goal_floor = -1;
     system->goal_dir = DIRN_STOP;
     system->dir = DIRN_STOP;
+    system->floor_status = UNKNOWN;
 
     for (int i = 0; i < N_FLOORS; ++i) {
-        memset(system->order_table, 0, N_BUTTONS * sizeof(bool));
+        for (int j = 0; j < N_BUTTONS; ++j) {
+            system->order_table[i][j] = false;
+            elevio_buttonLamp(i, j, 0);
+        }
     }
+    elevio_doorOpenLamp(0);
+    elevio_stopLamp(0);
+    elevio_floorIndicator(0);
 }
 
 void update_sensors(system_t *system) {
@@ -27,9 +34,16 @@ void update_sensors(system_t *system) {
 
     if (floor_sensor >= 0) {
         system->floor = floor_sensor;
+        system->floor_status = AT_VALID;
+    } else if (system->floor_status == AT_VALID) {
+        if (system->dir == DIRN_UP) {
+            system->floor_status = ABOVE_VALID;
+        } else if (system->dir == DIRN_DOWN) {
+            system->floor_status = BELOW_VALID;
+        }
     }
 
-    // FAT D4
+    // FAT D4, O1
     if (system->state == DOOR_OPEN && elevio_obstruction()) {
         gettimeofday(&system->door_open_time, NULL);
     }

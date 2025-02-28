@@ -27,7 +27,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(COMPILER) $^ -o $@ $(LDFLAGS)
 
 ## object files depend on source files: compile them. ALSO ON HEADER FILES OMG
-$(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c $(SOURCEDIR)/%.h
+$(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c
 	@mkdir -p $(@D)
 	$(COMPILER) -o $@ -c $(CFLAGS) $<
 

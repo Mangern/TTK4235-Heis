@@ -21,7 +21,8 @@ char* state_str(fsm_state_t state) {
         return "DOOR_CLOSE";
     case STOP:
         return "STOP";
-      break;
+    case STOP_AT_FLOOR:
+        return "STOP_AT_FLOOR";
     }
 }
 
