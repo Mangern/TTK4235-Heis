@@ -3,51 +3,37 @@
 #include <signal.h>
 #include <time.h>
 #include "driver/elevio.h"
+#include "driver/floor_tracker.h"
+#include "driver/order_manager.h"
+#include "driver/light_manager.h"
+#include "driver/door_manager.h"
 
 
-
-int main(){
+int main() {
     elevio_init();
-    
-    printf("=== Example Program ===\n");
+    floor_tracker_init();
+    order_manager_init();
+
+    printf("=== Elevator Control Program ===\n");
     printf("Press the stop button on the elevator panel to exit\n");
 
-    elevio_motorDirection(DIRN_UP);
+    elevio_motorDirection(DIRN_STOP); //starter i ro
 
-    int floor;
-    while(1){
-        floor = elevio_floorSensor();
+    while (1) {
+        update_floor_tracker();
+        update_order_manager();
+        update_lights();
 
-        if(floor == 0){
-            elevio_motorDirection(DIRN_UP);
-        }
-
-        if(floor == N_FLOORS-1){
-            elevio_motorDirection(DIRN_DOWN);
-        }
-
-
-        for(int f = 0; f < N_FLOORS; f++){
-            for(int b = 0; b < N_BUTTONS; b++){
-                int btnPressed = elevio_callButton(f, b);
-                elevio_buttonLamp(f, b, btnPressed);
-            }
-        }
-
-        if(elevio_obstruction()){
-            elevio_stopLamp(1);
-        } else {
-            elevio_stopLamp(0);
-        }
-        
-        if(elevio_stopButton()){
+        if (elevio_stopButton()) {
+            printf("\nStoppet!\n");
             elevio_motorDirection(DIRN_STOP);
+            elevio_stopLamp(1);
+            nanosleep(&(struct timespec){0, 3*1000*1000*1000}, NULL); // Vent 3 sek før avslutning
             break;
         }
-        
-        nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
+
+        nanosleep(&(struct timespec){0, 20*1000*1000}, NULL); // 20ms pause mellom oppdateringer
     }
 
     return 0;
 }
-
