@@ -12,6 +12,7 @@ OBJECTDIR = build
 
 SOURCES := $(patsubst $(SOURCEDIR)/%, %, $(shell find $(SOURCEDIR) -name '*.c'  ! -name $(EXCLUDE)  ! -path $(EXCLUDE)))
 OBJECTS = $(addprefix $(OBJECTDIR)/, $(SOURCES:.c=.o))
+HEADERS := $(SOURCES:.c=.h)
 
 all: $(EXECUTABLE) 
 
@@ -25,8 +26,8 @@ clean:
 $(EXECUTABLE): $(OBJECTS) 
 	$(COMPILER) $^ -o $@ $(LDFLAGS)
 
-## object files depend on source files: compile them
-$(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c
+## object files depend on source files: compile them. ALSO ON HEADER FILES OMG
+$(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c $(SOURCEDIR)/%.h
 	@mkdir -p $(@D)
 	$(COMPILER) -o $@ -c $(CFLAGS) $<
 
