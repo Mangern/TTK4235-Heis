@@ -1,6 +1,9 @@
+/**
+ * @file
+ * @brief The entry point of the Elevator application.
+ */
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <time.h>
 #include "driver/elevio.h"
 #include "system.h"
@@ -15,8 +18,6 @@ int main(){
         system_tick(&system);
         nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
     }
-
-    printf("Done\n");
 
     return 0;
 }
