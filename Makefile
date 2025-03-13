@@ -31,6 +31,8 @@ $(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c
 	@mkdir -p $(@D)
 	$(COMPILER) -o $@ -c $(CFLAGS) $<
 
+zip: $(EXECUTABLE)
+	zip -r heiskode-gruppe58.zip ./source/ README.md Makefile
 	
-.PHONY: all rebuild clean
+.PHONY: all rebuild clean zip
 

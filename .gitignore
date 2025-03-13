@@ -2,3 +2,5 @@ build/
 elevator
 .vscode
 html/
+latex/
+*.zip
